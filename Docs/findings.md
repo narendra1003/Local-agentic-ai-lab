@@ -1,104 +1,119 @@
 # Findings and Lessons Learned
 
-This document records key observations and conclusions derived from experiments in the **Local Agentic AI Lab** project.
+This document records the key observations and conclusions derived from experiments conducted as part of the **Local Agentic AI Lab** project.
 
-Findings are based on practical experimentation and may change as the project evolves.
+The findings are based on practical experimentation with locally hosted language models in an **OpenCode + Ollama** environment. They are not intended to represent universal model rankings or benchmark results.
 
-## Key Questions
-
-The project is currently investigating:
-
-1. Can consumer hardware support useful local AI-assisted coding workflows?
-2. Which tasks can smaller local models perform reliably?
-3. Should different models be specialized for different tasks?
-4. How reliable is tool calling on smaller models?
-5. How does context window size affect long-running workflows?
-6. Can structured context management improve agent performance?
+Findings may be updated as additional experiments are performed.
 
 ---
 
-## Finding 001 — Local AI Workflows Are Possible on Consumer Hardware
+## Finding 1 — Tool-Like Output Is Not Tool Execution
 
-The initial OpenCode and Ollama setup demonstrates that useful local AI experimentation can be performed without dedicated high-end AI hardware.
+Most of the tested models appeared capable of recognizing that the task involved a file operation.
 
-However, available hardware resources strongly influence:
+However, several models failed at the critical transition from understanding the required action to successfully participating in OpenCode's tool-execution workflow.
 
-* Model selection
-* Response speed
-* Context capacity
-* Workflow design
+Observed failure patterns included:
 
-### Current Conclusion
+* Tool-call JSON generated as normal text.
+* Function calls generated as plain text.
+* Pseudo instructions instead of actual tool invocation.
+* Code generation instead of task execution.
+* Malformed function calls.
+* Incorrect file paths.
+* False claims of successful completion.
 
-Local experimentation is practical, but workflow design must account for hardware limitations.
+This revealed an important distinction:
 
----
+> **Knowing what action should be performed is not the same as reliably invoking the required tool through an agent framework.**
 
-## Finding 002 — Model Selection Should Be Task-Specific
-
-Different models may be better suited to different tasks.
-
-A coding-focused model may not necessarily be the best model for:
-
-* Tool calling
-* General task interpretation
-* Planning
-
-Similarly, a general-purpose model may not be the most suitable model for code generation.
-
-### Current Conclusion
-
-Model selection should consider the specific role a model performs within the workflow rather than relying on a single universal ranking.
-
-Further experiments are required.
+For the primary Brain role, reliable orchestration is a mandatory requirement.
 
 ---
 
-## Finding 003 — Context Management Is a Critical Challenge
+## Finding 2 — Context Size Can Affect Practical Agent Behaviour
 
-Long-running agentic tasks can accumulate substantial amounts of information.
+The clearest evidence came from Qwen3.5:4B.
 
-This may include:
+The same model failed to execute tools at **4K** but successfully completed the file-creation task at **8K**.
 
-* User objectives
-* Previous actions
-* Tool outputs
-* File contents
-* Intermediate results
-* Task progress
+Qwen3:4B-Instruct also successfully demonstrated tool execution at **8K**.
 
-When the available context is limited, the workflow risks losing important information.
+Based on the current experiments:
 
-### Current Conclusion
+> **Context configuration can materially affect whether a small model successfully performs tool-mediated tasks within the agent workflow.**
 
-Context management is likely to be a major challenge for building reliable local agentic workflows.
+This finding is currently limited to the tested configurations and should not yet be generalized to every model.
 
-Potential approaches requiring further investigation include:
+---
+
+## Finding 3 — Two Models Passed the Initial Brain Test
+
+Among the tested models, only the following successfully completed the initial practical tool-execution test:
+
+1. **Qwen3:4B-Instruct**
+2. **Qwen3.5:4B**
+
+Both successfully created the requested file at an **8K context configuration**.
+
+These are currently the strongest candidates for further experimentation as the primary Brain.
+
+However, passing a simple tool-execution test does not establish that a model is suitable for all agentic tasks.
+
+---
+
+## Finding 4 — Tool Execution and Long-Running Agent Behaviour Are Separate Problems
+
+The experiments initially focused on identifying a model capable of successfully executing tools.
+
+This problem was partially solved with Qwen3:4B-Instruct and Qwen3.5:4B at 8K.
+
+However, continued experimentation exposed a second problem:
+
+> **Compaction and looping during longer workflows.**
+
+Both successful models encountered issues after the initial tool-execution stage.
+
+This indicates that a viable primary Brain requires at least two capabilities:
+
+1. **Reliable tool orchestration**
+2. **Reliable context and state management during extended workflows**
+
+Successfully passing the first requirement does not guarantee success on the second.
+
+---
+
+## Finding 5 — The Evaluation Focus Shifted From Model Selection to Context Management
+
+The initial question was:
+
+> **Which small local model can act as the Brain and execute OpenCode tools?**
+
+The experiments identified two promising candidates.
+
+The next major question became:
+
+> **How can a local agentic workflow preserve sufficient context and task state during longer execution without entering compaction or execution loops?**
+
+This shifted the project's focus toward investigating:
 
 * Context compaction
+* Context-window limitations
+* Task-state management
 * Structured summaries
-* Persistent task state
-* Selective context retrieval
+* Context persistence
+* Selective retrieval of relevant information
+* Long-running agent workflows
 
 ---
 
-## Findings Under Investigation
+## Current Direction
 
-The following areas require additional experimentation:
+The initial model-selection phase identified **Qwen3:4B-Instruct** and **Qwen3.5:4B** as the current leading candidates for the primary Brain role based on their ability to successfully execute tools at an 8K context configuration.
 
-* Reliable tool calling with small models
-* Model specialization
-* Multi-model workflows
-* Context compaction
-* Long-running task management
-* Repository-level analysis
+The project is now moving into the next phase of experimentation:
 
-## Important Principle
+> **Investigating how context can be managed, compacted, and preserved to support reliable long-running agentic workflows on resource-constrained local hardware.**
 
-This project does not treat early observations as final conclusions.
-
-Findings will be updated or revised when new experiments provide stronger evidence.
-
-## Current Status
-
-🚧 **Experiments Ongoing**
+Future findings will be added as new experiments are completed.
