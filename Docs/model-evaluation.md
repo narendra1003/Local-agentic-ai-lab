@@ -135,7 +135,7 @@ A failure at the default context configuration should **not** be interpreted as 
 
 ## 6. Key Findings
 
-### Finding 1 — Tool-Like Output Is Not Tool Execution
+### Tool-Like Output Is Not Tool Execution
 
 Most of the tested models appeared capable of recognizing that the task involved a file operation.
 
@@ -155,83 +155,10 @@ This revealed an important distinction:
 
 > **Knowing what action should be performed is not the same as reliably invoking the required tool through an agent framework.**
 
-For the primary Brain role, reliable orchestration is a mandatory requirement.
+### Context Size Can Affect Practical Agent Behaviour
+### Tool Execution and Long-Running Agent Behaviour Are Separate Problems
 
----
-
-### Finding 2 — Context Size Can Affect Practical Agent Behaviour
-
-The clearest evidence came from Qwen3.5:4B.
-
-The same model failed to execute tools at **4K** but successfully completed the file-creation task at **8K**.
-
-Qwen3:4B-Instruct also successfully demonstrated tool execution at **8K**.
-
-Based on the current experiments:
-
-> **Context configuration can materially affect whether a small model successfully performs tool-mediated tasks within the agent workflow.**
-
-This finding is currently limited to the tested configurations and should not yet be generalized to every model.
-
----
-
-### Finding 3 — Two Models Passed the Initial Brain Test
-
-Among the tested models, only the following successfully completed the initial practical tool-execution test:
-
-1. **Qwen3:4B-Instruct**
-2. **Qwen3.5:4B**
-
-Both successfully created the requested file at an **8K context configuration**.
-
-These are currently the strongest candidates for further experimentation as the primary Brain.
-
-However, passing a simple tool-execution test does not establish that a model is suitable for all agentic tasks.
-
----
-
-### Finding 4 — Tool Execution and Long-Running Agent Behaviour Are Separate Problems
-
-The experiments initially focused on identifying a model capable of successfully executing tools.
-
-This problem was partially solved with Qwen3:4B-Instruct and Qwen3.5:4B at 8K.
-
-However, continued experimentation exposed a second problem:
-
-> **Compaction and looping during longer workflows.**
-
-Both successful models encountered issues after the initial tool-execution stage.
-
-This indicates that a viable primary Brain requires at least two capabilities:
-
-1. **Reliable tool orchestration**
-2. **Reliable context and state management during extended workflows**
-
-Successfully passing the first requirement does not guarantee success on the second.
-
----
-
-### Finding 5 — The Evaluation Focus Shifted From Model Selection to Context Management
-
-The initial question was:
-
-> **Which small local model can act as the Brain and execute OpenCode tools?**
-
-The experiments identified two promising candidates.
-
-The next major question became:
-
-> **How can a local agentic workflow preserve sufficient context and task state during longer execution without entering compaction or execution loops?**
-
-This shifted the project's focus toward investigating:
-
-* Context compaction
-* Context-window limitations
-* Task-state management
-* Structured summaries
-* Context persistence
-* Selective retrieval of relevant information
-* Long-running agent workflows
+For the primary Brain role, reliable orchestration is a mandatory requirement. For other findings and their further observation, please refer the [findings.md](https://github.com/narendra1003/Local-agentic-ai-lab/blob/main/Docs/findings.md) resource.
 
 ---
 
